@@ -1,0 +1,4 @@
+libvirt-python==2.5.0
+pyYAML==3.12
+requests==2.12.4
+

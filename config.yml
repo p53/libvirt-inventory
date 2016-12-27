@@ -1,0 +1,8 @@
+libvirt_api:
+  port: '5000'
+  servers:
+    - localhost
+  auth:
+    username: TRANSFER
+    password: /h9xIk0tbF3A0lOzy6BYAQ==
+    ssl_verify: False
