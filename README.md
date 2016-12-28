@@ -26,6 +26,17 @@ Installation:
 
   **NOTE:** Generate your own private key and certificate, those included are for demo purposes!!
 
+Configuration:
+=========
+
+  **Config directory:**
+
+  You can customize location of config directory by setting up environment variable e.g.:
+
+  ```bash
+  export LIBVIRT_INVENTORY_CONFIG_DIR=~/.libvirt-inventory
+  ```
+  
 Usage:
 =========
 

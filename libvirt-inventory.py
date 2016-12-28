@@ -27,15 +27,27 @@ class Singleton(type):
 class Config():
     __metaclass__ = Singleton
 
-    def __init__(self, config_path):
+    def __init__(self):
+        utility_name = os.path.splitext(os.path.basename(__file__))[0]
+        script_path = os.path.realpath(__file__)
+        dir_path = os.path.dirname(script_path)
+
+        config_directory = os.getenv('LIBVIRT_INVENTORY_CONFIG_DIR', dir_path)
+        self.config_dir = config_directory
+
+        config_name = 'config.yml'
+        config_path = '{}/{}'.format(config_directory, config_name)
+
         try:
             self.config = yaml.load(open(config_path, 'r'))
         except yaml.YAMLError as exc:
             msg = 'Error in configuration file: {}'.format(str(exc))
-            return jsonify({'error': msg})
+            print msg
+            sys.exit(1)
         except Exception as exc:
             msg = 'Exception {}'.format(str(exc))
-            return jsonify({'error': msg})
+            print msg
+            sys.exit(1)
 
 class libvirt_domain_data_decorator(object):
 
@@ -50,6 +62,7 @@ class libvirt_domain_data_decorator(object):
 
             conf = Config()
             config = conf.config
+            config_dir = conf.config_dir
             port = config['libvirt_api']['port']
             username = config['libvirt_api']['auth']['username']
             password = config['libvirt_api']['auth']['password']
@@ -58,12 +71,8 @@ class libvirt_domain_data_decorator(object):
             for libvirt_server in config['libvirt_api']['servers']:
                 url = f(args[0], libvirt_server, port)
 
-                utility_name = os.path.splitext(os.path.basename(__file__))[0]
-                script_path = os.path.realpath(__file__)
-                dir_path = os.path.dirname(script_path)
-
                 crt_name = 'certificate.crt'
-                crt_path = '{}/{}'.format(dir_path, crt_name)
+                crt_path = '{}/{}'.format(config_dir, crt_name)
 
                 ssl_verify = crt_path if config['libvirt_api']['auth']['ssl_verify'] else False
 
@@ -95,14 +104,7 @@ class LibvirtInventory(object):
         self.inventory = dict()  # A list of groups and the hosts in that group
         self.cache = dict()  # Details about hosts in the inventory
 
-        utility_name = os.path.splitext(os.path.basename(__file__))[0]
-        script_path = os.path.realpath(__file__)
-        dir_path = os.path.dirname(script_path)
-
-        config_name = 'config.yml'
-        config_path = '{}/{}'.format(dir_path, config_name)
-
-        conf = Config(config_path)
+        conf = Config()
 
         self.parse_cli_args()
 
