@@ -85,6 +85,10 @@ class libvirt_domain_data_decorator(object):
                         for tag in domain_data['libvirt_tags']:
                             _push(inventory, tag, domain_data['libvirt_name'])
 
+                        guest_name_group = 'guest_{}'.format(domain_data['libvirt_name'])
+
+                        _push(inventory, guest_name_group, domain_data['libvirt_name'])
+
                         inventory['_meta']['hostvars'][domain_data['libvirt_name']] = domain_data
                         inventory['_meta']['hostvars'][domain_data['libvirt_name']]['ansible_host'] = domain_data['libvirt_ipv4']
                 else:
