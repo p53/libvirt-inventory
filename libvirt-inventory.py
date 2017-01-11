@@ -88,9 +88,11 @@ class libvirt_domain_data_decorator(object):
                         guest_name_group = 'guest_{}'.format(domain_data['libvirt_name'])
 
                         _push(inventory, guest_name_group, domain_data['libvirt_name'])
+                        _push(inventory, libvirt_server, domain_data['libvirt_name'])
 
                         inventory['_meta']['hostvars'][domain_data['libvirt_name']] = domain_data
                         inventory['_meta']['hostvars'][domain_data['libvirt_name']]['ansible_host'] = domain_data['libvirt_ipv4']
+                        inventory['_meta']['hostvars'][domain_data['libvirt_name']]['libvirt_host'] = libvirt_server
                 else:
                     msg = "Request to libvirt api on {} failed".format(libvirt_server)
                     print(msg)
