@@ -63,7 +63,7 @@ class libvirt_domain_data_decorator(object):
             conf = Config()
             config = conf.config
             config_dir = conf.config_dir
-            port = config['libvirt_api']['port']
+            port = int(config['libvirt_api']['port'])
             username = config['libvirt_api']['auth']['username']
             password = config['libvirt_api']['auth']['password']
             auth_object = HTTPBasicAuth(username, password)
