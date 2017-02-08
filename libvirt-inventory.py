@@ -9,6 +9,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import xml.etree.ElementTree as ET
 from functools import wraps
+import pprint
 
 try:
     import json
@@ -63,7 +64,7 @@ class libvirt_domain_data_decorator(object):
             conf = Config()
             config = conf.config
             config_dir = conf.config_dir
-            port = int(config['libvirt_api']['port'])
+            port = config['libvirt_api']['port']
             username = config['libvirt_api']['auth']['username']
             password = config['libvirt_api']['auth']['password']
             auth_object = HTTPBasicAuth(username, password)
@@ -81,8 +82,11 @@ class libvirt_domain_data_decorator(object):
                 if response.ok:
                     domains_data = response.json()
 
+                    pprint.pprint(domains_data['errors'], stream=sys.stderr)
+
                     for domain_data in domains_data['domains']:
-                        for tag in domain_data['libvirt_tags']:
+                        for tag_key in domain_data['libvirt_tags']:
+                            tag = 'tag_{}_{}'.format(tag_key, domain_data['libvirt_tags'][tag_key])
                             _push(inventory, tag, domain_data['libvirt_name'])
 
                         guest_name_group = 'guest_{}'.format(domain_data['libvirt_name'])
@@ -144,19 +148,28 @@ class LibvirtInventory(object):
             default=False,
             help='Pretty format (default: False)'
         )
+        parser.add_argument(
+            '--state',
+            action='store',
+            help='Get information about VM in specified state (defaults to running)',
+            default=1,
+            choices=['0', '1', '2', '3', '4', '5', '6', '7', '8','all']
+        )
         self.args = parser.parse_args()
 
     @libvirt_domain_data_decorator()
     def get_host_info(self, libvirt_server, port):
         ''' Get variables about a specific host '''
         host = self.args.host
-        url = 'https://{}:{}/domain/{}'.format(libvirt_server, port, host)
+        state = self.args.state
+        url = 'https://{}:{}/domain/{}/{}'.format(libvirt_server, port, host, state)
         return url
 
     @libvirt_domain_data_decorator()
     def get_inventory(self, libvirt_server, port):
         ''' Construct the inventory '''
-        url = 'https://{}:{}/domains'.format(libvirt_server, port)
+        state = self.args.state
+        url = 'https://{}:{}/domains/{}'.format(libvirt_server, port, state)
         return url
 
 def _push(my_dict, key, element):

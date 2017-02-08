@@ -2,7 +2,14 @@ libvirt_api:
   port: '5000'
   servers:
     - localhost
+    # - saturn.innovatrics.inn
+    # - pluto.innovatrics.inn
+    # - mars.innovatrics.inn
+    # - ceres.innovatrics.inn
+    # - mercury.innovatrics.inn
+    # - venus.innovatrics.inn
   auth:
     username: TRANSFER
+#    password: STo*D?$u_'Xqy[QG3oH)
     password: /h9xIk0tbF3A0lOzy6BYAQ==
     ssl_verify: False
